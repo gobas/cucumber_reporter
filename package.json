@@ -1,8 +1,8 @@
 {
-  "name": "My new SocketStream app",
-  "description": "An awesome real time application",
+  "name": "cucumber-reporter",
+  "description": "Cucumber Doc",
   "version": "0.1.0",
-  "author": "Me <me@mydomain.com>",
+  "author": "a0n <ai@gobas.de>",
   "private": true,
   "engines": { "node": ">= 0.4.0 < 0.5.0" },
   "dependencies": {
