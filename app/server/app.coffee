@@ -1,22 +1,48 @@
 # Server-side Code
 
 exports.actions =
-  
-  init: (cb) ->
-    cb "SocketStream version #{SS.version} is up and running. This message was sent over Socket.IO so everything is working OK."
-
-  import_results: (cb) ->
-    result = JSON.parse @request.post.raw
-    console.log result
-    cb result
+  all: (cb) ->
+    Seq()
+      .seq_((next) ->
+         R.smembers "apps", next
+      )
+      .flatten()
+      .parEach_((next, app) ->
+         R.smembers "instances:" + app, next.into(app)
+      )
+      .seq_((next) ->
+        apps = []
+        _.each @vars, (instances, app) ->
+          _.each instances, (instance) ->
+            apps.push {name: app, instance: instance}
+        next null, apps
+      )
+      .flatten()
+      .parEach_((next, app) ->
+        key = "test_results:" + app.name + ":" + app.instance
+        R.hkeys key, next.into(key)
+      )
+      .seq_((next)->
+        apps = {}
+        _.each @vars, (timestamps, key) ->
+          console.log timestamps, key
+          key = key.match(/test_results:([^:]*):([^:]*)/)
+          if key
+            app = key[1]
+            instance = key[2]
+            if apps[app]
+              apps[app].instances.push {name: instance, results: timestamps}
+            else
+              apps[app] = {name: app, instances: [{name: instance, results: timestamps}]}
+        apps_array = []
+        _.each apps, (app) ->
+          apps_array.push(app)
+        cb apps_array
+      )
+      .catch((err) ->
+        cb err
+      )
     
-  get_test_envs: (cb) ->
-    cb #return diffent test envs  
-    
-  get_result: (result_id, cb) ->
-    R.get "test123", (err, result) ->
-      cb result  
-    
-  get_results: (string, cb) ->
-    R.get string, (err, result) ->
-      cb result
+  instances: (app, cb) ->
+    R.smembers "instances:" + app, (err, response) ->
+      cb response
