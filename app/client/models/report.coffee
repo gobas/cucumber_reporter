@@ -24,6 +24,16 @@ window.Report = Backbone.Model.extend(
     tstamp = parseInt(@.get("timestamp"))
     x = new Date(tstamp)
     return x.toUTCString()
+
+  getFullReport: (cb) ->
+    self = @
+    SS.server.report.get_result self.collection.parent.collection.parent.get("name"), self.collection.parent.get("name"), self.get('timestamp'), (result) ->
+      result = JSON.parse result
+      self.set(result, {silent: true})
+      self.set({failing: self.isFailing(), undefined: self.isUndefined(), pending: self.isPending(), successfull: self.isSuccessfull(), complete: self.isComplete()}, {silent: true})
+      self.set({feature_count: self.featureCount(), scenario_count: self.scenarioCount()}, {silent: true})
+      self.set({created_at: self.getTimestamp()}, {silent: true})
+      cb(self)
     #return x.toUTCString()
 )
 
@@ -32,6 +42,6 @@ window.ReportList = Backbone.Collection.extend(
     self = @
     self.parent = options.parent if options.parent
   comparator: (report) ->
-    return report.get("timestamp")
+    return Date.now() - report.get("timestamp")
   model: Report
 )

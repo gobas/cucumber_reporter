@@ -1,69 +1,114 @@
-window.NavigationView = Backbone.View.extend(
-    el: $("body")
+window.ApplicationNavigationView = Backbone.View.extend(
+    el: $("#app_list")
     
     initialize: ->
       Apps.bind "add", @addOne, this
       Apps.bind "reset", @addAll, this
-      Apps.bind "all", @render, this
+      Apps.bind "all", @addAll, this
       Apps.fetch()
       $(".topbar").dropdown()
 
-    render: ->
-      $(".topbar .container-fluid").append ich.navigation {}
-
     addAll: ->
+      $("#app_list").html("")
       Apps.each(this.addOne);
         
     addOne: (app) ->
-      view = new NavigationItemView(model: app)
-      @$(".topbar ul.nav").append view.render().el
+      if app.get("active") == true
+        $(".nav > .apps").addClass("active")
+        $(".nav > .apps .dropdown-toggle").text(app.get("name"))
+          
+      view = new ApplicationNavigationItemView(model: app)
+      @$("#app_list").append view.render().el
   )
 
-window.NavigationItemView = Backbone.View.extend(
+window.ApplicationNavigationItemView = Backbone.View.extend(
   tagName: "li"
-  className: "dropdown"
+  className: "app"
+
+  events:
+    "click a": "openApp"
 
   initialize: ->
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this
     #@render_instances()
 
-  render_instances: (list) ->
-    model = @model
-    _.each model.instances.models, (instance) ->
-      console.log list
-      view = new InstanceNavigationView(model: instance)
-      list.append view.render().el
-
+  openApp: ->
+    $("#sidebar").html("")
+    $("#report").html("")
+    @model.collection.each (model) ->
+      model.set({active: false}, {silent: true})
+    @model.set({active: true})
+    view = new InstanceNavigationView(model: @model)
+    if $("ul.nav .instances").length > 0
+      $("ul.nav .instances").replaceWith view.render().el
+    else
+      $("ul.nav .apps").after view.render().el
+    view.addAll()
+  
   render: ->
     $(@el).html ich.nav_view @model.toJSON()
-    @render_instances $(@el).children('ul')
     return @
 )
 
+
 window.InstanceNavigationView = Backbone.View.extend(
+    tagName: "li"
+    className: "dropdown"
+      
+    initialize: ->
+      @model.instances.bind "add", @addOne, this
+      @model.instances.bind "reset", @addAll, this
+      @model.instances.bind "all", @render, this
+      $(@el).addClass("instances")
+      @model.instances.each (instance) ->
+        instance.set({active: false}, {silent: true})
+      
+
+    render: ->
+      $(@el).html ich.instances_view @model.toJSON()
+      @addAll()
+      return @
+
+    addAll: ->
+      console.log "add all"
+      @model.instances.each(this.addOne)
+      
+    addOne: (instance) ->
+      
+      console.log $("#instance_list")
+      if instance.get("active") == true
+        $(".nav > .instances").addClass("active")
+        $(".nav > .instances .dropdown-toggle").text(instance.get("name"))
+          
+      view = new InstanceNavigationItemView(model: instance)
+      @$("#instance_list").append view.render().el
+  )
+
+window.InstanceNavigationItemView = Backbone.View.extend(
   tagName: "li"
-  className: "report"
+  className: "instance"
     
   events:
-    "click a": "openReport"
+    "click a": "openInstance"
+  
+  markActive: ->
+    $(@el).parent().parent().addClass("active")
     
-  openReport: ->
+  openInstance: ->
+    @model.set({active: true})
+    @markActive()
+    
     results_view = new InstanceResultsView(model: @model)
     results_view.render()
 
-    report = @model.results.last()
-    
-    SS.server.report.get_result @model.collection.parent.get("name"), @model.get("name"), report.get('timestamp'), (result) ->
-      result = JSON.parse result
-      report.set(result, {silent: true})
-      report.set({failing: report.isFailing(), undefined: report.isUndefined(), pending: report.isPending(), successfull: report.isSuccessfull(), complete: report.isComplete()}, {silent: true})
-      report.set({feature_count: report.featureCount(), scenario_count: report.scenarioCount()}, {silent: true})
-      report.set({created_at: report.getTimestamp()}, {silent: true})
-      console.log report
-      report_view = new ReportView(model: report)
+    report = @model.results.first()
+    report.getFullReport (full_report) ->
+      console.log full_report
+      report_view = new ReportView(model: full_report)
       report_view.render()
-    
+    $("time.timeago").timeago();
+
   initialize: ->
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this

@@ -10,21 +10,32 @@ html(lang="en")
       .topbar-inner
         .container-fluid
           a(class="brand", href="#") Cucumber Reporter
-          
+          ul(class="nav")
+            li(class="dropdown apps")
+              a(href="#", class="dropdown-toggle")= "Apps"
+              ul(class="dropdown-menu", id="app_list")
+           
+
     div(id='content', class='container-fluid')
       div(class='row')
-        div(class='span4', id='sidebar')
+        div(class='span3', id='sidebar')
         div(class='span16', id='report')
         
+|<script id="instances_view" type="text/html">
+|  <a href="#", class="dropdown-toggle">Instances</a>
+|  <ul class="dropdown-menu", id="instance_list"></ul>
+|</script>
+
 |<script id="navigation" type="text/html">
-|<ul class='nav'>
-|</ul>
+|   <li class="dropdown apps">
+|      <a href="#" class='dropdown-toggle'>App</a>
+|      <ul class='dropdown-menu'>
+|      </ul>
+|   </li>
 |</script>
 
 |<script id="nav_view" type="text/html">
-|      <a href="#" class='dropdown-toggle'>{{name}}</a>
-|      <ul class='dropdown-menu'>
-|      </ul>
+|      <a {{#active}}class='active'{{/active}} href="#">{{name}}</a>
 |</script>
 
 |<script id="instance_view" type="text/html">
@@ -66,17 +77,23 @@ html(lang="en")
 |</script>
 
 |<script id="result_view" type="text/html">
-| <h1>Results:</h1>
+| <div class="well">
+|   <h3>
+|     {{app_name}}
+|     <small>{{name}}</small>
+|   </h3>
+|   <ul class='results unstyled'>
+|   </ul>
+| </div>
+|</script>
+
+|<script id="result_item_view" type="text/html">
+|   <a href="#"><time class="timeago" datetime="{{timestamp}}">{{timestamp}}</time></a>
 |</script>
 
 |<script id="report_view" type="text/html">
 | <h1>
-| Test Run
-| {{#complete}} <span class='label success'>All Tests passed!</span> {{/complete}}
-| {{^complete}}{{#failing}} <span class='label success'>Failed</span> {{/failing}}{{/complete}}
-| {{^complete}}{{^failing}}{{#undefined}} <span class='label warning'>Undefined Steps</span> {{/undefined}} {{/failing}}{{/complete}}
-| {{^complete}}{{^failing}}{{^undefined}}{{#pending}} <span class='label notice'>Pending Steps</span> {{/pending}}{{/undefined}}{{/failing}}{{/complete}}
-| <small>{{created_at}}</small>
+|   <time datetime="{{created_at}}">{{created_at}}</time>
 | </h1>
 | <div class='row'>
 |   <div class='span5'>
@@ -94,20 +111,20 @@ html(lang="en")
 |             <td>Scenarios</td>
 |             <td>{{scenario_count}}</td>
 |           </tr>
-|           <tr>
+|           <tr class='passed'>
 |               <td>Passed Steps</td>
 |               <td>{{passed_steps_count}}</td>
 |           </tr>
-|           <tr>
+|           <tr class='pending'>
 |               <td>Pending Steps</td>
 |               <td>{{pending_steps_count}}</td>
 |           </tr>
-|           <tr>
+|           <tr class='skipped'>
 |               <td>Skipped Steps</td>
 |               <td>{{skipped_steps_count}}</td>
 |           </tr>
 |           {{#undefined}}
-|               <tr>
+|               <tr class="undefined">
 |                 <td>Undefined Steps</td>
 |                 <td>{{undefined_steps_count}}</td>
 |               </tr>
