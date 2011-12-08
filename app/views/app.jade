@@ -18,32 +18,18 @@ html(lang="en")
         
 |<script id="navigation" type="text/html">
 |<ul class='nav'>
-|  <li class='nav'>
-|    {{#apps}}
-|      <a class='load_app' href='#'>{{.}}</a>
-|    {{/apps}}
-|  </li>
 |</ul>
 |</script>
 
 |<script id="nav_view" type="text/html">
-|  <a class='app'>{{name}}</a>
-|</script>
-
-|<script id="sidebar_view" type="text/html">
-| <div class='row'>
-|   <div class='span5'>
-|     <h1>Instances</h1>
-|       <ul class='instances'>
-|       </ul>
-|   </div>
-| </div>
+|      <a href="#" class='dropdown-toggle'>{{name}}</a>
+|      <ul class='dropdown-menu'>
+|      </ul>
 |</script>
 
 |<script id="instance_view" type="text/html">
 | <a href='#'>{{name}}</a>
 |</script>
-
 
 |<script id="tag" class="partial" type="text/html">
 | <li class='tag'>{{.}}</li>
@@ -77,6 +63,10 @@ html(lang="en")
 |    {{#scenarios}}{{>scenario}}{{/scenarios}}
 |  </div>  
 |</div>
+|</script>
+
+|<script id="result_view" type="text/html">
+| <h1>Results:</h1>
 |</script>
 
 |<script id="report_view" type="text/html">
