@@ -13,7 +13,7 @@ exports.init = ->
     el: $("#sidebar")
     render: ->
       model = @model.toJSON()
-      model.instances = @model.instances.toJSON()
+      model.instances = @model.results.toJSON()
       console.log model
       $(@el).html ich.result_view model
   ) 
