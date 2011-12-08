@@ -10,25 +10,127 @@ html(lang="en")
       .topbar-inner
         .container-fluid
           a(class="brand", href="#") Cucumber Reporter
-          ul.nav
-            li.active
-              a(href="#") All
           
-            li.active
-              a(href="#") Passed
-            
-            li.active
-              a(href="#") Pending
-            
-            li.active
-              a(href="#") Failed
-    .container-fluid
-      .sidebar
-        .well
-          h5 Server
-          ul
-            li
-              a(href="#") Current
-    
-      .content        
-        .cucumber-report
+    div(id='content', class='container-fluid')
+      div(class='row')
+        div(class='span4', id='sidebar')
+        div(class='span16', id='report')
+        
+|<script id="navigation" type="text/html">
+|<ul class='nav'>
+|  <li class='nav'>
+|    {{#apps}}
+|      <a class='load_app' href='#'>{{.}}</a>
+|    {{/apps}}
+|  </li>
+|</ul>
+|</script>
+
+|<script id="nav_view" type="text/html">
+|  <a class='app'>{{name}}</a>
+|</script>
+
+|<script id="sidebar_view" type="text/html">
+| <div class='row'>
+|   <div class='span5'>
+|     <h1>Instances</h1>
+|       <ul class='instances'>
+|       </ul>
+|   </div>
+| </div>
+|</script>
+
+|<script id="instance_view" type="text/html">
+| <a href='#'>{{name}}</a>
+|</script>
+
+
+|<script id="tag" class="partial" type="text/html">
+| <li class='tag'>{{.}}</li>
+|</script>
+
+|<script id="steps" class="partial" type="text/html">
+|<div class='row'>
+|  <div class='span8 {{keyword}}'><strong>{{keyword}}</strong> {{name}}</div>
+|  <div class='span1'>{{#result}}<span class='label {{label}}'>{{status}}</span>{{/result}}</div> 
+|</div>
+|</script>
+
+|<script id="scenario" class="partial" type="text/html">
+|  <div class='row {{keyword}}'>
+|    <div class='span8'>
+|      <h4>{{name}} <small>{{duration}} milliseconds</small></h4>
+|    </div>
+|  </div>
+|  <div class='well {{#result}}{{label}}{{/result}}'>{{#steps}}{{>steps}}{{/steps}}</div>
+|</script>
+
+|<script id="feature" class="partial" type="text/html">
+|<div class='{{keyword}} row'>
+|  <div class='span6'>
+|    <h2>{{name}} <small>{{duration}} milliseconds</small></h2>
+|    {{#description}}<blockquote><p>{{{description}}}</p></blockquote>{{/description}}  
+|    <h3>Tags</h3>
+|    <ul>{{#tags}}{{>tag}}{{/tags}}</ul>
+|  </div>
+|  <div class='span10'> 
+|    {{#scenarios}}{{>scenario}}{{/scenarios}}
+|  </div>  
+|</div>
+|</script>
+
+|<script id="report_view" type="text/html">
+| <h1>
+| Test Run
+| {{#complete}} <span class='label success'>All Tests passed!</span> {{/complete}}
+| {{^complete}}{{#failing}} <span class='label success'>Failed</span> {{/failing}}{{/complete}}
+| {{^complete}}{{^failing}}{{#undefined}} <span class='label warning'>Undefined Steps</span> {{/undefined}} {{/failing}}{{/complete}}
+| {{^complete}}{{^failing}}{{^undefined}}{{#pending}} <span class='label notice'>Pending Steps</span> {{/pending}}{{/undefined}}{{/failing}}{{/complete}}
+| <small>{{created_at}}</small>
+| </h1>
+| <div class='row'>
+|   <div class='span5'>
+|     <table class='zebra-striped'>
+|       <tbody>
+|           <tr>
+|             <td>Duration</td>
+|             <td>{{duration}} Seconds</td>
+|           </tr>
+|           <tr>
+|             <td>Features</td>
+|             <td>{{feature_count}}</td>
+|           </tr>
+|           <tr>
+|             <td>Scenarios</td>
+|             <td>{{scenario_count}}</td>
+|           </tr>
+|           <tr>
+|               <td>Passed Steps</td>
+|               <td>{{passed_steps_count}}</td>
+|           </tr>
+|           <tr>
+|               <td>Pending Steps</td>
+|               <td>{{pending_steps_count}}</td>
+|           </tr>
+|           <tr>
+|               <td>Skipped Steps</td>
+|               <td>{{skipped_steps_count}}</td>
+|           </tr>
+|           {{#undefined}}
+|               <tr>
+|                 <td>Undefined Steps</td>
+|                 <td>{{undefined_steps_count}}</td>
+|               </tr>
+|           {{/undefined}}
+|           {{#failing}}
+|               <tr>
+|                 <td>Failed Steps</td>
+|                 <td>{{failed_steps_count}}</td>
+|               </tr>
+|           {{/failing}}
+|       </tbody>
+|      </table>
+|   </div>
+| </div>
+| {{#features}}{{>feature}}{{/features}}
+|</script>
