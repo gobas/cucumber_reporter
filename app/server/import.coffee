@@ -4,16 +4,20 @@ exports.actions =
   results: (params, cb) ->
     instance = params.instance
     app = params.app
-    result = @request.post.raw
+    result_raw = @request.post.raw
+    result = JSON.parse result_raw
     key = "test_results:" + app + ":" + instance
     hkey = Date.now()
+    result["timestamp"] = hkey
     
-    
+    SS.publish.broadcast "newResult", {app_name: app, instance_name: instance, result: result}
+
+
     R.sadd "apps", app
     R.sadd "instances:" + app, instance
     
     
-    R.hset key, hkey, result, (err, response) ->
+    R.hset key, hkey, result_raw, (err, response) ->
       if (err)
         cb err
       else if response == 0
