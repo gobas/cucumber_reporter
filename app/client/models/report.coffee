@@ -23,16 +23,20 @@ window.Report = Backbone.Model.extend(
   getTimestamp: ->
     tstamp = parseInt(@.get("timestamp"))
     x = new Date(tstamp)
-    return x.toUTCString()
+    return x.toISOString()
+
+  addMetaData: ->
+    self = @
+    self.set({failing: self.isFailing(), undefined: self.isUndefined(), pending: self.isPending(), successfull: self.isSuccessfull(), complete: self.isComplete()}, {silent: true})
+    self.set({feature_count: self.featureCount(), scenario_count: self.scenarioCount()}, {silent: true})
+    self.set({created_at: self.getTimestamp()}, {silent: true})
 
   getFullReport: (cb) ->
     self = @
     SS.server.report.get_result self.collection.parent.collection.parent.get("name"), self.collection.parent.get("name"), self.get('timestamp'), (result) ->
       result = JSON.parse result
       self.set(result, {silent: true})
-      self.set({failing: self.isFailing(), undefined: self.isUndefined(), pending: self.isPending(), successfull: self.isSuccessfull(), complete: self.isComplete()}, {silent: true})
-      self.set({feature_count: self.featureCount(), scenario_count: self.scenarioCount()}, {silent: true})
-      self.set({created_at: self.getTimestamp()}, {silent: true})
+      self.addMetaData()
       cb(self)
     #return x.toUTCString()
 )
