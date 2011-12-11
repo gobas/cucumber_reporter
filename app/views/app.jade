@@ -56,7 +56,7 @@ html(lang="en")
 |<script id="scenario" class="partial" type="text/html">
 |  <div class='row {{keyword}}'>
 |    <div class='span8'>
-|      <h4>{{name}} <small>{{duration}} milliseconds</small></h4>
+|      <h4>{{name}} <small>{{duration}} ms</small></h4>
 |    </div>
 |  </div>
 |  <div class='well {{#result}}{{label}}{{/result}}'>{{#steps}}{{>steps}}{{/steps}}</div>
@@ -65,7 +65,7 @@ html(lang="en")
 |<script id="feature" class="partial" type="text/html">
 |<div class='{{keyword}} row'>
 |  <div class='span6'>
-|    <h2>{{name}} <small>{{duration}} milliseconds</small></h2>
+|    <h2>{{name}} <small>{{duration}} ms</small></h2>
 |    {{#description}}<blockquote><p>{{{description}}}</p></blockquote>{{/description}}  
 |    <h3>Tags</h3>
 |    <ul>{{#tags}}{{>tag}}{{/tags}}</ul>
@@ -92,25 +92,20 @@ html(lang="en")
 |</script>
 
 |<script id="report_view" type="text/html">
-| <h1>
-|   <time datetime="{{created_at}}">{{created_at}}</time>
-| </h1>
 | <div class='row'>
-|   <div class='span5'>
-|     <table class='zebra-striped'>
+|   <div class="span8">  
+|     <h1>
+|       <time datetime="{{created_at}}">{{created_at}}</time>
+|       <br/>
+|       <small>
+|         completed in {{duration}} seconds <br/>
+|         <time class="timeago" datetime="{{created_at}}">{{created_at}}</time> 
+|       </small>
+|     </h1>
+|   </div>
+|   <div class="span4">
+|      <table class='zebra-striped'>
 |       <tbody>
-|           <tr>
-|             <td>Duration</td>
-|             <td>{{duration}} Seconds</td>
-|           </tr>
-|           <tr>
-|             <td>Features</td>
-|             <td>{{feature_count}}</td>
-|           </tr>
-|           <tr>
-|             <td>Scenarios</td>
-|             <td>{{scenario_count}}</td>
-|           </tr>
 |           <tr class='passed'>
 |               <td>Passed Steps</td>
 |               <td>{{passed_steps_count}}</td>
@@ -135,6 +130,28 @@ html(lang="en")
 |                 <td>{{failed_steps_count}}</td>
 |               </tr>
 |           {{/failing}}
+|       </tbody>
+|      </table>
+|   </div>
+|   <div class="span4">
+|      <table class='zebra-striped'>
+|       <tbody>
+|           <tr>
+|             <td>Features</td>
+|             <td>{{feature_count}}</td>
+|           </tr>
+|           <tr class='passed'>
+|               <td>Passed Features</td>
+|               <td>{{passed_features_count}}</td>
+|           </tr>
+|           <tr>
+|             <td>Scenarios</td>
+|             <td>{{scenario_count}}</td>
+|           </tr>
+|           <tr class='passed'>
+|               <td>Passed Scenarios</td>
+|               <td>{{passed_scenarios_count}}</td>
+|           </tr>
 |       </tbody>
 |      </table>
 |   </div>
