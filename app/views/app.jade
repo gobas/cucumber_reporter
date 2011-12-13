@@ -35,11 +35,11 @@ html(lang="en")
 |</script>
 
 |<script id="nav_view" type="text/html">
-|      <a {{#active}}class='active'{{/active}} href="#">{{name}}</a>
+|      <a {{#active}}class='active'{{/active}} href="#app/{{name}}">{{name}}</a>
 |</script>
 
 |<script id="instance_view" type="text/html">
-| <a href='#'>{{name}}</a>
+| <a href='#app/{{app_name}}/{{name}}'>{{name}}</a>
 |</script>
 
 |<script id="tag" class="partial" type="text/html">
@@ -48,8 +48,23 @@ html(lang="en")
 
 |<script id="steps" class="partial" type="text/html">
 |<div class='row'>
-|  <div class='span8 {{keyword}}'><strong>{{keyword}}</strong> {{name}}</div>
-|  <div class='span1'>{{#result}}<span class='label {{label}}'>{{status}}</span>{{/result}}</div> 
+|  <div class='span8 {{keyword}}'>
+|    <strong>{{keyword}}</strong> {{name}}
+|    {{#exception}}
+|      <div class="exception">
+|        <strong>{{name}}</strong>
+|        <span>Expected: {{expected}} {{operator}} {{actual}}</span>
+|        <pre><code>
+|           {{stack}}
+|        </code></pre>
+|      </div>
+|    {{/exception}}
+| </div>
+|  <div class='span1'>
+|     {{#result}}
+|       <span class='label {{label}}'>{{status}}</span>
+|     {{/result}}
+|  </div> 
 |</div>
 |</script>
 
@@ -63,7 +78,7 @@ html(lang="en")
 |</script>
 
 |<script id="feature" class="partial" type="text/html">
-|<div class='{{keyword}} row'>
+|<div class='{{keyword}} row {{#result}}{{status}}{{/result}}'>
 |  <div class='span6'>
 |    <h2>{{name}} <small>{{duration}} ms</small></h2>
 |    {{#description}}<blockquote><p>{{{description}}}</p></blockquote>{{/description}}  
@@ -134,7 +149,7 @@ html(lang="en")
 |      </table>
 |   </div>
 |   <div class="span4">
-|      <table class='zebra-striped'>
+|      <table class='zebra-striped feature_info'>
 |       <tbody>
 |           <tr>
 |             <td>Features</td>
@@ -143,6 +158,18 @@ html(lang="en")
 |           <tr class='passed'>
 |               <td>Passed Features</td>
 |               <td>{{passed_features_count}}</td>
+|           </tr>
+|           <tr class='pending'>
+|               <td>Pending Features</td>
+|               <td>{{pending_features_count}}</td>
+|           </tr>
+|           <tr class='undefined'>
+|               <td>Undefined Features</td>
+|               <td>{{undefined_features_count}}</td>
+|           </tr>
+|           <tr class='failed'>
+|               <td>Failed Features</td>
+|               <td>{{failed_features_count}}</td>
 |           </tr>
 |           <tr>
 |             <td>Scenarios</td>

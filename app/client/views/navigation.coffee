@@ -5,7 +5,6 @@ window.ApplicationNavigationView = Backbone.View.extend(
       Apps.bind "add", @addOne, this
       Apps.bind "reset", @addAll, this
       Apps.bind "all", @addAll, this
-      Apps.fetch()
       $(".topbar").dropdown()
 
     addAll: ->
@@ -25,26 +24,10 @@ window.ApplicationNavigationItemView = Backbone.View.extend(
   tagName: "li"
   className: "app"
 
-  events:
-    "click a": "openApp"
-
   initialize: ->
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this
     #@render_instances()
-
-  openApp: ->
-    $("#sidebar").html("")
-    $("#report").html("")
-    @model.collection.each (model) ->
-      model.set({active: false}, {silent: true})
-    @model.set({active: true})
-    view = new InstanceNavigationView(model: @model)
-    if $("ul.nav .instances").length > 0
-      $("ul.nav .instances").replaceWith view.render().el
-    else
-      $("ul.nav .apps").after view.render().el
-    view.addAll()
   
   render: ->
     $(@el).html ich.nav_view @model.toJSON()
@@ -66,7 +49,8 @@ window.InstanceNavigationView = Backbone.View.extend(
       
 
     render: ->
-      $(@el).html ich.instances_view @model.toJSON()
+      app = @model.toJSON()
+      $(@el).html ich.instances_view app
       @addAll()
       return @
 
@@ -89,32 +73,18 @@ window.InstanceNavigationItemView = Backbone.View.extend(
   tagName: "li"
   className: "instance"
     
-  events:
-    "click a": "openInstance"
-  
   markActive: ->
     $(@el).parent().parent().addClass("active")
     
-  openInstance: ->
-    @model.set({active: true})
-    @markActive()
-    
-    results_view = new InstanceResultsView(model: @model)
-    results_view.render()
-
-    report = @model.results.first()
-    report.getFullReport (full_report) ->
-      console.log full_report
-      report_view = new ReportView(model: full_report)
-      report_view.render()
-    $("time.timeago").timeago();
-
   initialize: ->
     @model.bind "change", @render, this
     @model.bind "destroy", @remove, this
 
   render: ->
-    $(@el).html ich.instance_view @model.toJSON()
+    instance = @model.toJSON()
+    console.log @model.collection.parent.get("name"), "instance navigation"
+    instance["app_name"] = @model.collection.parent.get("name")
+    $(@el).html ich.instance_view instance
     return @
 )
 

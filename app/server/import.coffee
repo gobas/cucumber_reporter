@@ -16,6 +16,7 @@ exports.actions =
     R.sadd "apps", app
     R.sadd "instances:" + app, instance
     
+    console.log JSON.parse result_raw
     
     R.hset key, hkey, result_raw, (err, response) ->
       if (err)

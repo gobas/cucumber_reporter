@@ -13,6 +13,37 @@ exports.init = ->
   window.Apps = new AppList
   window.ReportView = Backbone.View.extend(
     el: $("#report")
+
+    events:
+      "click .feature_info .passed": "togglePassedFeatures"
+      "click .feature_info .pending": "togglePendingFeatures"
+      "click .feature_info .undefined": "toggleUndefinedFeatures"
+      "click .feature_info .pending": "togglePendingFeatures"
+      "click .feature_info .failed": "toggleFailedFeatures"
+    
+    togglePassedFeatures: ->
+      console.log @el
+      $(".Feature.passed").toggle()
+      $(".feature_info .passed").toggleClass("hidden");
+
+    togglePendingFeatures: ->
+      console.log @el.target
+      $(".Feature.pending").toggle()
+      $(".feature_info .passed").toggleClass("hidden");
+
+    toggleUndefinedFeatures: ->
+      $(".Feature.undefined").toggle()
+      $(".feature_info .undefined").toggleClass("hidden");
+
+    togglePendingFeatures: ->
+      $(".Feature.pending").toggle()
+      $(".feature_info .pending").toggleClass("hidden");
+
+    toggleFailedFeatures: ->
+      $(".Feature.failed").toggle()
+      $(".feature_info .failed").toggleClass("hidden");
+
+
     render: ->
       model = @model.toJSON()
       model.duration = model.duration / 1000.0
@@ -84,7 +115,7 @@ exports.init = ->
       return @
   )
 
-  app_router = new AppRouter
-  Backbone.history.start()
   window.ApplicationNavigationView = new ApplicationNavigationView
-  
+  Apps.fetch success: ->
+    window.app_router = new AppRouter
+    Backbone.history.start()
