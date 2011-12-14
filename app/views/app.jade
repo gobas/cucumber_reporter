@@ -68,13 +68,24 @@ html(lang="en")
 |</div>
 |</script>
 
-|<script id="scenario" class="partial" type="text/html">
-|  <div class='row {{keyword}}'>
-|    <div class='span8'>
-|      <h4>{{name}} <small>{{duration}} ms</small></h4>
-|    </div>
+|<script id="background" class="partial" type="text/html">
+|      <h4>Background</h4>
+|  <div class='well {{#result}}{{label}}{{/result}}'>
+|    {{#steps}}
+|      {{>steps}}
+|    {{/steps}}
 |  </div>
-|  <div class='well {{#result}}{{label}}{{/result}}'>{{#steps}}{{>steps}}{{/steps}}</div>
+|</script>
+
+|<script id="scenario" class="partial" type="text/html">
+| <div class="{{keyword}} {{#result}}{{status}}{{/result}}">
+|      <h4>{{name}} <small>{{duration}} ms</small></h4>
+|  <div class='well {{#result}}{{label}}{{/result}}'>
+|    {{#steps}}
+|      {{>steps}}
+|    {{/steps}}
+|  </div>
+| </div>
 |</script>
 
 |<script id="feature" class="partial" type="text/html">
@@ -85,7 +96,8 @@ html(lang="en")
 |    <h3>Tags</h3>
 |    <ul>{{#tags}}{{>tag}}{{/tags}}</ul>
 |  </div>
-|  <div class='span10'> 
+|  <div class='span10'>
+|    {{#background}}{{>background}}{{/background}}
 |    {{#scenarios}}{{>scenario}}{{/scenarios}}
 |  </div>  
 |</div>
@@ -103,7 +115,7 @@ html(lang="en")
 |</script>
 
 |<script id="result_item_view" type="text/html">
-|   <a href="#"><time class="timeago" datetime="{{timestamp}}">{{timestamp}}</time></a>
+|   <a class="{{#active}}active{{/active}}" href="#app/{{app_name}}/{{instance_name}}/{{timestamp}}"><time class="timeago" datetime="{{created_at}}">{{created_at}}</time></a>
 |</script>
 
 |<script id="report_view" type="text/html">
@@ -155,27 +167,33 @@ html(lang="en")
 |             <td>Features</td>
 |             <td>{{feature_count}}</td>
 |           </tr>
-|           <tr class='passed'>
+|           <tr class='feature passed'>
 |               <td>Passed Features</td>
 |               <td>{{passed_features_count}}</td>
 |           </tr>
-|           <tr class='pending'>
+|           {{#pending}}
+|           <tr class='feature pending'>
 |               <td>Pending Features</td>
 |               <td>{{pending_features_count}}</td>
 |           </tr>
-|           <tr class='undefined'>
+|           {{/pending}}
+|           {{#undefined}}
+|           <tr class='feature undefined'>
 |               <td>Undefined Features</td>
 |               <td>{{undefined_features_count}}</td>
 |           </tr>
-|           <tr class='failed'>
+|           {{/undefined}}
+|           {{#failing}}
+|           <tr class='feature failed'>
 |               <td>Failed Features</td>
 |               <td>{{failed_features_count}}</td>
 |           </tr>
+|           {{/failing}}
 |           <tr>
 |             <td>Scenarios</td>
 |             <td>{{scenario_count}}</td>
 |           </tr>
-|           <tr class='passed'>
+|           <tr class='scenario passed'>
 |               <td>Passed Scenarios</td>
 |               <td>{{passed_scenarios_count}}</td>
 |           </tr>

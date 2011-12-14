@@ -1,11 +1,33 @@
 window.Report = Backbone.Model.extend(
+  initialize: ->
+    self = @
+    console.log "initalizing report", self
+    if self.get("features")
+      self.instances = new FeatureList(self.get("features"), {parent: self})
+      delete self.attributes["features"]
+
   featureCount: ->
-    return @.get("features").length
+    return @.features.length
+
   scenarioCount: ->
     scenario_count = 0
-    _.each @.get("features"), (feature) ->
+    _.each @.features.each (feature) ->
       scenario_count = scenario_count + feature.scenarios.length
     return scenario_count
+
+  fullJSON: ->
+    json = @.toJSON()
+    json["duration"] = json["duration"] / 1000.0
+    json["features"] = @.features.fullJSON()
+    return json
+
+  navJSON: ->
+    json = @.toJSON()
+    json["instance_name"] = @.collection.parent.get("name")
+    json["app_name"] = @.collection.parent.collection.parent.get("name")
+    tstamp = new Date(parseInt(json["timestamp"]))
+    json["created_at"] = tstamp.toISOString()
+    return json
 
   isUndefined: ->
     return @.get("undefined_steps_count") > 0
@@ -35,6 +57,8 @@ window.Report = Backbone.Model.extend(
     self = @
     SS.server.report.get_result self.collection.parent.collection.parent.get("name"), self.collection.parent.get("name"), self.get('timestamp'), (result) ->
       result = JSON.parse result
+      self.features = new FeatureList(result["features"], {parent: self})
+      delete result["features"]
       self.set(result, {silent: true})
       self.addMetaData()
       cb(self)
