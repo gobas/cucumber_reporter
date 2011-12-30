@@ -12,7 +12,6 @@ exports.actions =
     
     SS.publish.broadcast "newResult", {app_name: app, instance_name: instance, result: result}
 
-
     R.sadd "apps", app
     R.sadd "instances:" + app, instance
     
