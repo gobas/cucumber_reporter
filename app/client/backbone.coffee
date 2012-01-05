@@ -1,16 +1,19 @@
 SS.events.on 'newResult', (report) ->
-  console.log "newREsult"
-  console.log report
+  console.log "newResult", report
   app = window.Apps.find (app) ->
     app.get("name") == report.app_name
   if app
     instance = app.instances.find (instance) ->
       instance.get("name") == report.instance_name
   if instance
-    result = report["result"]
-    report = new Report(result)
-    #report.addMetaData()
-    instance.results.add report
+    features = report["result"]["features"]
+    delete report["result"]["features"]
+    result = new Report(report["result"])
+    result.features = new FeatureList(features, {parent: instance})
+    instance.results.add result
+    router = new AppRouter
+    router.navigate "#app/" + app.get("name") + "/" + instance.get("name") + "/latest"
+    result.openReport()
 
 exports.init = ->
   window.ReportView = Backbone.View.extend(

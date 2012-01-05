@@ -1,7 +1,7 @@
 window.Report = Backbone.Model.extend(
   initialize: ->
     self = @
-    console.log "initalizing report", self
+    console.log "initalizing report", self.attributes
     if self.get("features")
       self.instances = new FeatureList(self.get("features"), {parent: self})
       delete self.attributes["features"]
@@ -52,6 +52,20 @@ window.Report = Backbone.Model.extend(
     self.set({failing: self.isFailing(), undefined: self.isUndefined(), pending: self.isPending(), successfull: self.isSuccessfull(), complete: self.isComplete()}, {silent: true})
     self.set({feature_count: self.featureCount(), scenario_count: self.scenarioCount()}, {silent: true})
     self.set({created_at: self.getTimestamp()}, {silent: true})
+
+  openReport: ->
+    result = @
+    result.collection.each (model) ->
+      model.set({active: false}, {silent: true})
+    result.set({active: true})
+
+    if result.get("created_at")
+      view = new ReportView(model: result)
+      view.render()
+    else
+      result.getFullReport (report) ->
+        view = new ReportView(model: result)
+        view.render()
 
   getFullReport: (cb) ->
     self = @

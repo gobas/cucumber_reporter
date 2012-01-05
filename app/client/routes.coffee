@@ -28,8 +28,7 @@ loadAppInstance = (app, instance) ->
 
     results_view = new InstanceResultsView(model: instance)
     results_view.render()
-    window.location = "#app/" + app.get("name") + "/" + instance.get("name") + "/" + instance.results.first().get("timestamp")
-
+    
     #report = instance.results.first()
     #report.getFullReport (full_report) ->
     #  console.log full_report
@@ -53,20 +52,15 @@ window.AppRouter = Backbone.Router.extend(
     
   loadAppInstanceResult: (app, instance, timestamp) ->
     instance = loadAppInstance(app, instance)
-    result = instance.results.find (stored_result) ->
-      return stored_result.get("timestamp") == timestamp
-    result.set({active: true})
-    result.collection.each (model) ->
-      model.set({active: false}, {silent: true})
-
-    if result.get("created_at")
-      view = new ReportView(model: result)
-      view.render()
+  
+    if timestamp == "latest"
+      result = instance.results.first()
     else
-      result.getFullReport (report) ->
-        view = new ReportView(model: result)
-        view.render()
-
+      result = instance.results.find (stored_result) ->
+        return stored_result.get("timestamp").toString() == timestamp
+    
+    result.openReport()
+    
 
     console.log app, instance, timestamp
 )
